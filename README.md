@@ -1,5 +1,5 @@
 # the url:
 
-https://tommyedmunds.github.io/damiens/
+https://tommyedmunds.github.io/damiens-visualizer/
 
 created in p5js
