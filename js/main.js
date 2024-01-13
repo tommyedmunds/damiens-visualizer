@@ -1,7 +1,8 @@
 let song;
 function preload() {
-  song = loadSound('../assets/uzeless.mp3');
+  // song = loadSound('../assets/uzeless.mp3');
   // song = loadSound('../assets/thejudge.mp3');
+  song = loadSound('https://tommyedmunds.github.io/damiens/assets/thejudge.mp3');
 }
 
 let w;
