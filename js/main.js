@@ -3,6 +3,7 @@ function preload() {
   song = loadSound(
     'https://tommyedmunds.github.io/damiens-visualizer/assets/uzeless.mp3'
   );
+  // song = loadSound('../assets/uzeless.mp3');
 }
 
 let w;
@@ -91,7 +92,10 @@ function draw() {
       angle += random(0, 1);
       init(y, x);
     }
+    // console.log(y, x);
+    // init(y, x);
   }
+  // init(y, x);
   generate();
 
   for (let i = 0; i < columns; i++) {
@@ -117,8 +121,10 @@ function calcWidth(x, rows, columns) {
 
 // Fill board randomly
 function init(yCoord, xCoord) {
-  let y = map(yCoord, 0, width, 0, rows) + 20;
-  // let y = map(yCoord, 0, windowWidth, 0, rows);
+  // use when you want actual waveform
+  // let y = map(yCoord * 2, 0, width, 0, rows);
+
+  const y = map(yCoord * 2, 0, width, 0, rows);
   const x = map(xCoord, 0, width / 2, 0, columns);
 
   for (let i = 0; i < columns; i++) {
@@ -127,12 +133,18 @@ function init(yCoord, xCoord) {
       if (i == 0 || j == 0 || i == columns - 1 || j == rows - 1) board[i][j] = 0;
       // Filling the rest reactively
       else if (yCoord < 525) {
-        // interesting form
+        // interesting form, takes actual shape of waveform
         if (j > y && j < y + 1 && i > x && i < x + 1) {
           board[i][j] = 1;
+          break;
         }
+
+        // if (j === floor(y - 1)) {
+        //   board[i][j] = 1;
+        //   break;
+        // }
       } else {
-        if (!yCoord && !yCoord) {
+        if (!yCoord && !xCoord) {
           board[i][j] = floor(random(2));
         }
 
