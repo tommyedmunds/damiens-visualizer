@@ -1,6 +1,6 @@
 onmessage = function (e) {
   let { columns, rows, board } = e.data;
-  console.log('worker run');
+
   next = new Array(columns);
   for (let i = 0; i < columns; i++) {
     next[i] = new Array(rows);
@@ -25,9 +25,9 @@ onmessage = function (e) {
   }
 
   // Swap!
-  // let temp = board;
-  // board = next;
-  // next = temp;
+  let temp = board;
+  board = next;
+  next = temp;
   // console.log(next);
   postMessage({ next, board });
 };

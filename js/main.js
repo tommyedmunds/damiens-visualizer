@@ -11,7 +11,6 @@ let columns;
 let rows;
 let board;
 let next;
-let peakDetect;
 let x = 0;
 let y = 0;
 let h = 0;
@@ -24,9 +23,12 @@ let amplitude;
 
 const livingSquares = [];
 
+const generate = new Worker('js/worker.js');
+const initWorker = new Worker('js/init.js');
+
 function setup() {
   // Set simulation framerate to 10 to avoid flickering
-  frameRate(120);
+  frameRate(45);
   createCanvas(windowWidth, windowHeight);
 
   song.loop();
@@ -44,7 +46,6 @@ function setup() {
   amplitude.setInput(song);
 
   fft = new p5.FFT();
-  peakDetect = new p5.PeakDetect();
 
   button = createButton(`${windowWidth}, ${windowHeight}`);
 
@@ -57,7 +58,7 @@ function setup() {
   fft = new p5.FFT();
   song.amp(0.2);
 
-  w = 10;
+  w = 9;
   // Calculate columns and rows
   columns = floor(width / w);
   rows = floor(height / w);
@@ -71,7 +72,7 @@ function setup() {
   for (i = 0; i < columns; i++) {
     next[i] = new Array(rows);
   }
-  init();
+  init(true);
 }
 
 const xThresh = 0.48;
@@ -83,20 +84,35 @@ function draw() {
   background(255);
   waveform = fft.waveform();
 
-  peakDetect.update(fft);
-
   if (song.isPlaying()) {
     for (i = 0; i < waveform.length / 2; i++) {
-      x = map(i, 0, waveform.length, 0, width);
+      x = map(i, 0, waveform.length / 2, 0, width);
       y = map(waveform[i], -1, 1, 0, height) + sin(angle) * 20;
       angle += random(0, 1);
-      init(y, x);
+      // use worker here
+      // initWorker.postMessage({ y, x, columns, rows, next, width, board });
+      // initWorker.onmessage = function (e) {
+      //   board = e.data.board;
+      //   next = e.data.next;
+      // };
+
+      // if (floor(random(2)) % 2 === 0) {
+      if (frameCount % 5 === 0) {
+        init(y, x);
+      }
     }
     // console.log(y, x);
     // init(y, x);
   }
   // init(y, x);
-  generate();
+  // generate();
+
+  generate.postMessage({ columns, rows, board });
+  generate.onmessage = function (e) {
+    next = e.data.next;
+    board = e.data.board;
+  };
+  // worker goes here
 
   for (let i = 0; i < columns; i++) {
     for (let j = 0; j < rows; j++) {
@@ -120,7 +136,7 @@ function calcWidth(x, rows, columns) {
 }
 
 // Fill board randomly
-function init(yCoord, xCoord) {
+function init(yCoord, xCoord, shake = false) {
   // use when you want actual waveform
   // let y = map(yCoord * 2, 0, width, 0, rows);
 
@@ -134,17 +150,17 @@ function init(yCoord, xCoord) {
       // Filling the rest reactively
       else if (yCoord < 525) {
         // interesting form, takes actual shape of waveform
-        if (j > y && j < y + 1 && i > x && i < x + 1) {
-          board[i][j] = 1;
-          break;
+        if (floor(yCoord) % 17 !== 0) {
+          if (j > y && j < y + 1 && i > x && i < x + 1) {
+            board[i][j] = 1;
+          }
+        } else {
+          if (j === floor(y - 1)) {
+            board[i][j] = 1;
+          }
         }
-
-        // if (j === floor(y - 1)) {
-        //   board[i][j] = 1;
-        //   break;
-        // }
       } else {
-        if (!yCoord && !xCoord) {
+        if ((!yCoord && !xCoord) || shake) {
           board[i][j] = floor(random(2));
         }
 
@@ -159,36 +175,36 @@ function init(yCoord, xCoord) {
 }
 
 // The process of creating the new generation
-function generate() {
-  // Loop through every spot in our 2D array and check spots neighbors
-  for (let x = 1; x < columns - 1; x++) {
-    for (let y = 1; y < rows - 1; y++) {
-      // Add up all the states in a 3x3 surrounding grid
-      let neighbors = 0;
-      for (let i = -1; i <= 1; i++) {
-        for (let j = -1; j <= 1; j++) {
-          neighbors += board[x + i][y + j];
-        }
-      }
+// function generate() {
+//   // Loop through every spot in our 2D array and check spots neighbors
+//   for (let x = 1; x < columns - 1; x++) {
+//     for (let y = 1; y < rows - 1; y++) {
+//       // Add up all the states in a 3x3 surrounding grid
+//       let neighbors = 0;
+//       for (let i = -1; i <= 1; i++) {
+//         for (let j = -1; j <= 1; j++) {
+//           neighbors += board[x + i][y + j];
+//         }
+//       }
 
-      // A little trick to subtract the current cell's state since
-      // we added it in the above loop
-      neighbors -= board[x][y];
-      // Rules of Life
-      if (board[x][y] == 1 && neighbors < 2) next[x][y] = 0; // Loneliness
-      else if (board[x][y] == 1 && neighbors > 3) next[x][y] = 0; // Overpopulation
-      else if (board[x][y] == 0 && neighbors == 3) {
-        next[x][y] = 1;
-      } // Reproduction
-      else next[x][y] = board[x][y]; // Stasis
-    }
-  }
+//       // A little trick to subtract the current cell's state since
+//       // we added it in the above loop
+//       neighbors -= board[x][y];
+//       // Rules of Life
+//       if (board[x][y] == 1 && neighbors < 2) next[x][y] = 0; // Loneliness
+//       else if (board[x][y] == 1 && neighbors > 3) next[x][y] = 0; // Overpopulation
+//       else if (board[x][y] == 0 && neighbors == 3) {
+//         next[x][y] = 1;
+//       } // Reproduction
+//       else next[x][y] = board[x][y]; // Stasis
+//     }
+//   }
 
-  // Swap!
-  let temp = board;
-  board = next;
-  next = temp;
-}
+//   // Swap!
+//   let temp = board;
+//   board = next;
+//   next = temp;
+// }
 
 function togglePlaying() {
   if (!song.isPlaying()) {
