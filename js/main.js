@@ -140,7 +140,7 @@ function init(yCoord, xCoord, shake = false) {
   // use when you want actual waveform
   // let y = map(yCoord * 2, 0, width, 0, rows);
 
-  const y = map(yCoord * 2, 0, width, 0, rows);
+  const y = map(yCoord, 0, height, 0, rows);
   const x = map(xCoord, 0, width, 0, columns);
 
   for (let i = 0; i < columns; i++) {
@@ -164,7 +164,7 @@ function init(yCoord, xCoord, shake = false) {
           board[i][j] = floor(random(2));
         }
 
-        if (i > x && i < x + 1) {
+        if (i === floor(x)) {
           board[i][j] = 1;
         }
 
