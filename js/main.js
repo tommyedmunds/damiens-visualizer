@@ -28,7 +28,7 @@ const initWorker = new Worker('js/init.js');
 
 function setup() {
   // Set simulation framerate to 10 to avoid flickering
-  frameRate(45);
+  frameRate(120);
   createCanvas(windowWidth, windowHeight);
 
   song.loop();
@@ -51,7 +51,7 @@ function setup() {
 
   button.mousePressed(togglePlaying);
 
-  initButton = createButton('shake it up');
+  initButton = createButton('spawn random cells');
 
   initButton.mousePressed(init);
 
@@ -97,9 +97,9 @@ function draw() {
       // };
 
       // if (floor(random(2)) % 2 === 0) {
-      if (frameCount % 5 === 0) {
-        init(y, x);
-      }
+      // if (frameCount % 2 === 0) {
+      init(y, x);
+      // }
     }
     // console.log(y, x);
     // init(y, x);
