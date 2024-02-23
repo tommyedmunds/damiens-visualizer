@@ -141,7 +141,7 @@ function init(yCoord, xCoord, shake = false) {
   // let y = map(yCoord * 2, 0, width, 0, rows);
 
   const y = map(yCoord * 2, 0, width, 0, rows);
-  const x = map(xCoord, 0, width / 2, 0, columns);
+  const x = map(xCoord, 0, width, 0, columns);
 
   for (let i = 0; i < columns; i++) {
     for (let j = 0; j < rows; j++) {
