@@ -1,7 +1,7 @@
 let song;
 function preload() {
   song = loadSound(
-    'https://tommyedmunds.github.io/damiens-visualizer/assets/uzeless.mp3'
+    'https://tommyedmunds.github.io/damiens-visualizer/assets/damiensregicide.mp3'
   );
   // song = loadSound('../assets/uzeless.mp3');
 }
