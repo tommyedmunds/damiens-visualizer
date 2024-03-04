@@ -50,63 +50,33 @@ function draw() {
   translate(-width / 2, -height / 2, 0);
   waveform = fft.waveform();
 
-  if (frameCount % 200 === 0) {
-    console.log('clear');
-    clear();
-  }
   if (song.isPlaying()) {
     for (let i = 0; i < waveform.length; i++) {
       let x = map(i, 0, waveform.length, 0, width);
       let y = map(waveform[i] / 1.4, -1, 1, 0, height);
 
       if (y > 550) {
-        let heightVar = 0;
-
-        if (Math.abs(millis() - storedMilliseconds) > 15) {
+        if (Math.abs(millis() - storedMilliseconds) > 5) {
           ready = true;
         }
 
         if (ready) {
-          console.log('fired', y);
-          // line(width / 2, 0, 100, width / 2, height, 100);
           strokeWeight(50);
-          line(0, x, 100, width, x, 100);
-          // if (y % 5 === 0) {
-
-          // } else {
-          //   strokeWeight(50);
-          //   line(width / 2, 0, 100, width / 2, height, 100);
-          // }
-
+          if (floor(x) % 2 === 0) {
+            line(x, 0, 100, x, height, 100);
+          } else {
+            line(0, x, 100, width, x, 100);
+          }
           ready = false;
           storedMilliseconds = millis();
         }
-        // for (let j = 0; j < 50; j++) {
-        //   // point(x, random(0, height), 1);
-        //   point(width / 2, heightVar, 1);
-        //   heightVar += height / 57;
-
-        //   if (heightVar > height) {
-        //     heightVar = random(0, height - 200);
-        //   }
-        // }
-
-        // for (let i = 1; i < height * 0.01; i++) {
-        //   stroke(color(random(0, 255), random(0, 255), random(0, 255)));
-        //   strokeWeight(3);
-        //   point(x * 3, random(0, y) * 2);
-        // }
       } else {
-        // for (let j = 0; j < 2; j++) {
-        // point(x, y, 1);
-        // }
-        const sWeight = map(x, 0, width, 100, 300);
+        const sWeight = map(x, 0, width, 100, 500);
         if (Math.abs(millis() - storedMilliseconds2) > 10) {
           ready2 = true;
         }
 
         if (ready2) {
-          // line(width * 0.25, y, 100, width * 0.25, y + 50, 100);
           strokeWeight(sWeight);
           line(width * 0.25, y, 100, width * 0.25, y + sWeight, 100);
           ready2 = false;
