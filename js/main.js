@@ -19,6 +19,9 @@ let storedMilliseconds2 = 0;
 let ready3 = true;
 let storedMilliseconds3 = 0;
 
+let ready4 = true;
+let storedMilliseconds4 = 0;
+
 let angle = 0;
 
 function preload() {
@@ -56,15 +59,16 @@ function draw() {
       let y = map(waveform[i] / 1.4, -1, 1, 0, height);
 
       if (y > 550) {
-        if (Math.abs(millis() - storedMilliseconds) > 5) {
+        if (Math.abs(millis() - storedMilliseconds) > 1) {
           ready = true;
         }
 
         if (ready) {
-          strokeWeight(50);
           if (floor(x) % 2 === 0) {
+            strokeWeight(50);
             line(x, 0, 100, x, height, 100);
           } else {
+            strokeWeight(100);
             line(0, x, 100, width, x, 100);
           }
           ready = false;
@@ -95,8 +99,16 @@ function draw() {
           storedMilliseconds3 = millis();
         }
 
-        // point(width * 0.25, y, 1);
-        // point(width * 0.75, y, 1);
+        if (Math.abs(millis() - storedMilliseconds4) > 10) {
+          ready4 = true;
+        }
+
+        if (ready4) {
+          strokeWeight(sWeight);
+          line(width * 0.5, y, 100, width * 0.5, y + sWeight, 100);
+          ready4 = false;
+          storedMilliseconds4 = millis();
+        }
       }
     }
   }
